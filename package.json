@@ -1,0 +1,27 @@
+{
+  "name": "async-retry-handler",
+  "version": "1.0.0",
+  "description": "Retry an asynchronous operation with customizable retry options",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jasbanza/async-retry-handler.git"
+  },
+  "keywords": [
+    "nodejs",
+    "automation"
+  ],
+  "author": "jasbanza",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jasbanza/async-retry-handler/issues"
+  },
+  "homepage": "https://github.com/jasbanza/async-retry-handler#readme",
+  "dependencies": {
+    "retry": "^0.13.1"
+  }
+}
