@@ -11,7 +11,7 @@ import retry from "retry";
  * @param {number} [options.maxTimeout=10000] - The maximum time in milliseconds between retry attempts. Defaults to 10000 (10 seconds).
  * @param {number} [options.maxRetryTime=60000] - The maximum time in milliseconds for all retry attempts combined. Defaults to 60000 (60 seconds).
  * @param {Function} options.successCriteria - A function that determines if the operation response was successful. It must return a boolean based on your success criteria.
- * @param {Function} [options.parseSuccessResult] - A function to parse the result before resolving it.
+ * @param {Function} [options.parseResult] - A function to parse the result before resolving it.
  * @param {Function} [options.onSuccess] - A callback function to be called if the operation succeeds.
  * @param {Function} [options.onFailure] - A callback function to be called if the operation fails after all retries.
  * @param {number} [options.factor=1] - The factor by which the timeout between retries is multiplied. Defaults to 1.
@@ -27,20 +27,20 @@ async function asyncRetryHandler({
   maxTimeout = 10000,
   maxRetryTime = 60000,
   successCriteria,
-  parseSuccessResult,
-  onSuccess,
-  onFailure,
+  parseResult = null,
+  onSuccess = null,
+  onFailure = null,
   factor = 1,
   randomize = false,
   debug = false,
 }) {
   const operation = retry.operation({
     retries: maxRetries,
-    minTimeout: minTimeout,
-    maxTimeout: maxTimeout,
-    maxRetryTime: maxRetryTime,
-    factor: factor,
-    randomize: randomize,
+    minTimeout,
+    maxTimeout,
+    maxRetryTime,
+    factor,
+    randomize,
   });
 
   return new Promise((resolve, reject) => {
@@ -54,11 +54,12 @@ async function asyncRetryHandler({
             onSuccess(result);
           }
 
-          if (parseSuccessResult) {
-            result = parseSuccessResult(result);
+          if (parseResult) {
+            const parsedResult = parseResult(result);
+            resolve(parsedResult);
+          } else {
+            resolve(result);
           }
-
-          resolve(result);
         } else {
           // If success criteria not met
           if (operation.retry()) {
