@@ -11,10 +11,12 @@ import retry from "retry";
  * @param {number} [options.maxTimeout=10000] - The maximum time in milliseconds between retry attempts. Defaults to 10000 (10 seconds).
  * @param {number} [options.maxRetryTime=60000] - The maximum time in milliseconds for all retry attempts combined. Defaults to 60000 (60 seconds).
  * @param {Function} options.successCriteria - A function that determines if the operation response was successful. It must return a boolean based on your success criteria.
+ * @param {Function} [options.parseSuccessResult] - A function to parse the result before resolving it.
  * @param {Function} [options.onSuccess] - A callback function to be called if the operation succeeds.
  * @param {Function} [options.onFailure] - A callback function to be called if the operation fails after all retries.
  * @param {number} [options.factor=1] - The factor by which the timeout between retries is multiplied. Defaults to 1.
  * @param {boolean} [options.randomize=false] - If true, randomizes the timeout between retries. Defaults to false.
+ * @param {boolean} [options.debug=false] - If true, log debugging information.
  * @returns {Promise} A Promise that resolves with the result of the successful operation or rejects with an error.
  */
 async function asyncRetryHandler({
@@ -25,6 +27,7 @@ async function asyncRetryHandler({
   maxTimeout = 10000,
   maxRetryTime = 60000,
   successCriteria,
+  parseSuccessResult,
   onSuccess,
   onFailure,
   factor = 1,
@@ -46,18 +49,25 @@ async function asyncRetryHandler({
         const result = await operationFunction(...operationFunctionArgs);
 
         if (successCriteria(result)) {
+          // If success criteria met
           if (onSuccess) {
             onSuccess(result);
           }
+
+          if (parseSuccessResult) {
+            result = parseSuccessResult(result);
+          }
+
           resolve(result);
         } else {
+          // If success criteria not met
           if (operation.retry()) {
             // Retry the operation
             if (debug) {
               console.log(
                 `Retrying operation: ${
                   operationFunction.name || "Anonymous Function"
-                }`
+                } (Attempt ${currentAttempt})`
               );
             }
             return;
@@ -76,6 +86,13 @@ async function asyncRetryHandler({
       } catch (error) {
         if (operation.retry(error)) {
           // Retry the operation
+          if (debug) {
+            console.log(
+              `Retrying operation: ${
+                operationFunction.name || "Anonymous Function"
+              } (Attempt ${currentAttempt})`
+            );
+          }
           return;
         }
         if (onFailure) {
