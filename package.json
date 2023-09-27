@@ -1,6 +1,6 @@
 {
   "name": "async-retry-handler",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Retry an asynchronous operation with customizable retry options",
   "main": "index.js",
   "type": "module",

@@ -46,20 +46,18 @@ async function asyncRetryHandler({
   return new Promise((resolve, reject) => {
     operation.attempt(async (currentAttempt) => {
       try {
-        const result = await operationFunction(...operationFunctionArgs);
+        let result = await operationFunction(...operationFunctionArgs);
 
         if (successCriteria(result)) {
           // If success criteria met
+
+          if (parseResult) {
+            result = parseResult(result);
+          }
           if (onSuccess) {
             onSuccess(result);
           }
-
-          if (parseResult) {
-            const parsedResult = parseResult(result);
-            resolve(parsedResult);
-          } else {
-            resolve(result);
-          }
+          resolve(result);
         } else {
           // If success criteria not met
           if (operation.retry()) {
