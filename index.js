@@ -10,7 +10,7 @@ import retry from "retry";
  * @param {number} [options.minTimeout=500] - The minimum time in milliseconds between retry attempts. Defaults to 500.
  * @param {number} [options.maxTimeout=10000] - The maximum time in milliseconds between retry attempts. Defaults to 10000 (10 seconds).
  * @param {number} [options.maxRetryTime=60000] - The maximum time in milliseconds for all retry attempts combined. Defaults to 60000 (60 seconds).
- * @param {Function} options.successCriteria - A function that determines if the operation response was successful. It must return a boolean based on your success criteria.
+ * @param {Function} [options.successCriteria] - A function that determines if the operation response was successful. It must return a boolean based on your success criteria.
  * @param {Function} [options.parseResult] - A function to parse the result before resolving it.
  * @param {Function} [options.onSuccess] - A callback function to be called if the operation succeeds.
  * @param {Function} [options.onFailure] - A callback function to be called if the operation fails after all retries.
@@ -26,7 +26,7 @@ async function asyncRetryHandler({
   minTimeout = 500,
   maxTimeout = 10000,
   maxRetryTime = 60000,
-  successCriteria,
+  successCriteria = (result) => !!result,
   parseResult = null,
   onSuccess = null,
   onFailure = null,
