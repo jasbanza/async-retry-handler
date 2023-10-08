@@ -48,7 +48,7 @@ async function asyncRetryHandler({
       try {
         let result = await operationFunction(...operationFunctionArgs);
 
-        if (await successCriteria(result)) {
+        if (successCriteria.constructor.name === "AsyncFunction" ? await successCriteria(result) : successCriteria(result)) {
           // If success criteria met
 
           if (parseResult) {
@@ -64,16 +64,14 @@ async function asyncRetryHandler({
             // Retry the operation
             if (debug) {
               console.log(
-                `Retrying operation: ${
-                  operationFunction.name || "Anonymous Function"
+                `Retrying operation: ${operationFunction.name || "Anonymous Function"
                 } (Attempt ${currentAttempt})`
               );
             }
             return;
           }
           const error = new Error(
-            `Operation ${
-              operationFunction.name || "Anonymous Function"
+            `Operation ${operationFunction.name || "Anonymous Function"
             } failed after ${maxRetries} retries.`
           );
           error.result = result;
@@ -87,8 +85,7 @@ async function asyncRetryHandler({
           // Retry the operation
           if (debug) {
             console.log(
-              `Retrying operation: ${
-                operationFunction.name || "Anonymous Function"
+              `Retrying operation: ${operationFunction.name || "Anonymous Function"
               } (Attempt ${currentAttempt})`
             );
           }
