@@ -48,7 +48,7 @@ async function asyncRetryHandler({
       try {
         let result = await operationFunction(...operationFunctionArgs);
 
-        if (successCriteria(result)) {
+        if (await successCriteria(result)) {
           // If success criteria met
 
           if (parseResult) {
